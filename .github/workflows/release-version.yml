@@ -53,7 +53,7 @@ jobs:
           git tag --force $VERSION_TAG
           echo "::set-output name=version_tag::$VERSION_TAG"
       - name: Push the branch (with tags)
-        run: git push --follow-tags origin release/v${{ steps.amend-version-commit.outputs.version_tag }}
+        run: git push --follow-tags origin release/${{ steps.amend-version-commit.outputs.version_tag }}
 
   create-pull-request:
     name: Create pull request
@@ -68,7 +68,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               head: 'main',
-              base: 'release/v${{ steps.amend-version-commit.outputs.version_tag }}',
+              base: 'release/${{ steps.amend-version-commit.outputs.version_tag }}',
             })
 
             return pullRequest.number

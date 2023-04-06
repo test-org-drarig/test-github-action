@@ -1,6 +1,7 @@
 {
   "name": "test-github-action",
   "packageManager": "yarn@4.0.0-rc.39",
+  "version": "0.1.0",
   "scripts": {
     "build": "echo build",
     "package": "echo package"
