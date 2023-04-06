@@ -6,22 +6,22 @@ on:
   workflow_dispatch:
     inputs:
       semver:
-        description: 'Semver argument for the version bump to do on the CI integration'
+        description: "Semver argument for the version bump to do on the CI integration"
         required: true
-        default: 'minor'
+        default: "minor"
         type: choice
         options:
-          - 'patch'
-          - 'minor'
-          - 'major'
+          - "patch"
+          - "minor"
+          - "major"
       upgrade_datadog_ci:
-        description: 'Whether or not to upgrade datadog-ci'
+        description: "Whether or not to upgrade datadog-ci"
         required: true
         type: boolean
       datadog_ci_version:
-        description: 'Version of datadog-ci to install'
+        description: "Version of datadog-ci to install"
         type: string
-        default: 'latest'
+        default: "latest"
 
 jobs:
   prepare-branch:
@@ -32,7 +32,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v2
         with:
-          node-version: 'lts/*'
+          node-version: "lts/*"
       - name: Create release branch
         run: git checkout -b release/local-branch
       - name: Set git user
@@ -64,7 +64,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const { data: pullRequest } = octokit.rest.pulls.create({
+            const { data: pullRequest } = github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               head: 'main',
@@ -77,7 +77,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const { data: releaseNotes } = await octokit.rest.repos.generateReleaseNotes({
+            const { data: releaseNotes } = await github.rest.repos.generateReleaseNotes({
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: '${{ steps.amend-version-commit.outputs.version_tag }}',
