@@ -42,7 +42,9 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Bump CI integration version
-        run: yarn version --${{ github.events.inputs.semver }}
+        run: |
+          echo ${{ github.events.inputs.semver }}
+          yarn version --${{ github.events.inputs.semver }}
       - name: Update build files
         run: yarn build && yarn package
       - name: Amend version commit
@@ -58,6 +60,7 @@ jobs:
   create-pull-request:
     name: Create pull request
     runs-on: ubuntu-latest
+    needs: [prepare-branch]
     steps:
       - name: Create pull request
         id: create-pull-request

@@ -4,6 +4,6 @@
   "version": "0.1.0",
   "scripts": {
     "build": "echo build",
-    "package": "echo package"
+    "package": "echo package >> index.js"
   }
 }
