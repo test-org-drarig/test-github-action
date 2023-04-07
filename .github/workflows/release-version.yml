@@ -83,7 +83,7 @@ jobs:
               base: 'main',
               head: 'release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
               title: 'Release `${{ steps.amend-version-commit.outputs.VERSION_TAG }}`',
-              body: `${{ steps.generate-release-notes.outputs.result }}`
+              body: ${{ steps.generate-release-notes.outputs.result }}
             })
 
             return pullRequest.number
