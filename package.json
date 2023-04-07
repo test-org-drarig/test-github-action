@@ -3,7 +3,7 @@
   "packageManager": "yarn@4.0.0-rc.39",
   "version": "0.1.0",
   "scripts": {
-    "build": "echo build",
-    "package": "echo package >> index.js"
+    "build": "echo build >> index.js",
+    "package": "mkdir -p ./dist && cp index.js dist/index.js"
   }
 }
