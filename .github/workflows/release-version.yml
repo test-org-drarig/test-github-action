@@ -44,8 +44,8 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
       - name: Create bump commit
         run: git commit -a --message '[dep] Bump datadog-ci to `${{ steps.bump-datadog-ci.outputs.VERSION }}`'
-      - name: Push the branch (with tags)
-        run: git push --follow-tags -u origin local-branch:bump-datadog-ci/${{ steps.bump-datadog-ci.outputs.VERSION }}
+      - name: Push the branch
+        run: git push -u origin local-branch:bump-datadog-ci/${{ steps.bump-datadog-ci.outputs.VERSION }}
 
       # Create the pull request
       - name: Create pull request
@@ -59,7 +59,7 @@ jobs:
               base: 'main',
               head: 'bump-datadog-ci/${{ steps.bump-datadog-ci.outputs.VERSION }}',
               title: '[dep] Bump datadog-ci to `${{ steps.bump-datadog-ci.outputs.VERSION }}`',
-              body: 'This PR bumps [datadog-ci](https://github.com/DataDog/datadog-ci) to version [`${{ steps.bump-datadog-ci.outputs.VERSION }}`](https://github.com/DataDog/datadog-ci/releases/tag/${{ steps.bump-datadog-ci.outputs.VERSION }})'
+              body: 'This PR bumps [datadog-ci](https://github.com/DataDog/datadog-ci) to version [`${{ steps.bump-datadog-ci.outputs.VERSION }}`](https://github.com/DataDog/datadog-ci/releases/tag/v${{ steps.bump-datadog-ci.outputs.VERSION }})'
             })
 
             return pullRequest.number
