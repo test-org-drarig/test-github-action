@@ -1,14 +1,19 @@
 # This workflow automatically creates a release PR for the CI integration.
 
-name: Bump Datadog CI
+name: Create Release PR
 
 on:
   workflow_dispatch:
     inputs:
-      datadog_ci_version:
-        description: "Version of datadog-ci to install (`latest` or `A.B.C`)"
-        type: string
-        default: "latest"
+      semver:
+        description: "Semver argument for the version bump to do on the CI integration"
+        required: true
+        default: "minor"
+        type: choice
+        options:
+          - "patch"
+          - "minor"
+          - "major"
 
 permissions:
   contents: write
@@ -32,22 +37,33 @@ jobs:
           git config user.email noreply@github.com
       - name: Install dependencies
         run: yarn install
-      - name: Bump datadog-ci
-        id: bump-datadog-ci
+      - name: Bump CI integration version
+        run: yarn version --${{ github.event.inputs.semver }}
+      - name: Update build files
+        run: yarn build && yarn package
+      - name: Amend version commit
+        id: amend-version-commit
         run: |
-          VERSION=${{ github.event.inputs.datadog_ci_version }}
-          if [ "$VERSION" = "latest" ]; then
-            VERSION=$(npm view @datadog/datadog-ci --json | jq -r '.version')
-          fi
-
-          yarn add @datadog/datadog-ci@^$VERSION
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-      - name: Create bump commit
-        run: git commit -a --message '[dep] Bump datadog-ci to `${{ steps.bump-datadog-ci.outputs.VERSION }}`'
-      - name: Push the branch
-        run: git push -u origin local-branch:bump-datadog-ci/${{ steps.bump-datadog-ci.outputs.VERSION }}
+          VERSION_TAG=$(git tag --points-at HEAD) 
+          git commit --all --amend --no-edit
+          git tag --force $VERSION_TAG
+          echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_OUTPUT
+      - name: Push the branch (with tags)
+        run: git push --follow-tags -u origin local-branch:release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}
 
       # Create the pull request
+      - name: Generate release notes
+        id: generate-release-notes
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: releaseNotes } = await github.rest.repos.generateReleaseNotes({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: '${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
+            })
+
+            return releaseNotes.body
       - name: Create pull request
         id: create-pull-request
         uses: actions/github-script@v6
@@ -57,9 +73,9 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               base: 'main',
-              head: 'bump-datadog-ci/${{ steps.bump-datadog-ci.outputs.VERSION }}',
-              title: '[dep] Bump datadog-ci to `${{ steps.bump-datadog-ci.outputs.VERSION }}`',
-              body: 'This PR bumps [datadog-ci](https://github.com/DataDog/datadog-ci) to version [`${{ steps.bump-datadog-ci.outputs.VERSION }}`](https://github.com/DataDog/datadog-ci/releases/tag/v${{ steps.bump-datadog-ci.outputs.VERSION }})'
+              head: 'release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
+              title: '[release:${{ github.event.inputs.semver }}] `${{ steps.amend-version-commit.outputs.VERSION_TAG }}`',
+              body: ${{ steps.generate-release-notes.outputs.result }}
             })
 
             return pullRequest.number
