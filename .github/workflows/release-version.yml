@@ -34,9 +34,13 @@ jobs:
         run: yarn install
       - name: Bump datadog-ci
         run: |
-          VERSION=$(echo "${{ github.event.inputs.datadog_ci_version || 'my version' }}")
-          echo "computed: $VERSION"
-          echo "computed: ${{ github.event.inputs.datadog_ci_version }}"
+          VERSION=${{ github.event.inputs.datadog_ci_version }}
+
+          if [ "$VERSION" = "latest" }} ]; then
+            VERSION=$(npm view @datadog/datadog-ci --json | jq '.version')
+          fi
+
+          yarn add @datadog/datadog-ci@^$VERSION
       # - name: Update build files
       #   run: yarn build && yarn package
       # - name: Amend version commit
