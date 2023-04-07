@@ -29,7 +29,6 @@ permissions:
 
 jobs:
   create-release-pull-request:
-    name: Prepare the release branch
     runs-on: ubuntu-latest
     steps:
       # Do the changes
