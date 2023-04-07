@@ -57,8 +57,6 @@ jobs:
           echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_OUTPUT
       - name: Push the branch (with tags)
         run: git push --follow-tags -u origin local-branch:release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   create-pull-request:
     name: Create pull request
