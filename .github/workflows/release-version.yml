@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       datadog_ci_version:
-        description: "Version of datadog-ci to install (format: `vA.B.C`)"
+        description: "Version of datadog-ci to install (`latest` or `A.B.C`)"
         type: string
         default: "latest"
 
