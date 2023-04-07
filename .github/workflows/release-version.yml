@@ -37,7 +37,7 @@ jobs:
           VERSION=${{ github.event.inputs.datadog_ci_version }}
 
           if [ "$VERSION" = "latest" ]; then
-            VERSION=$(npm view @datadog/datadog-ci --json | jq '.version')
+            VERSION=$(npm view @datadog/datadog-ci --json | jq -r '.version')
           fi
 
           yarn add @datadog/datadog-ci@^$VERSION
