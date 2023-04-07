@@ -1,25 +1,12 @@
 # This workflow automatically creates a release PR for the CI integration.
 
-name: Create Release PR
+name: Bump Datadog CI
 
 on:
   workflow_dispatch:
     inputs:
-      semver:
-        description: "Semver argument for the version bump to do on the CI integration"
-        required: true
-        default: "minor"
-        type: choice
-        options:
-          - "patch"
-          - "minor"
-          - "major"
-      upgrade_datadog_ci:
-        description: "Whether or not to upgrade datadog-ci"
-        required: true
-        type: boolean
       datadog_ci_version:
-        description: "Version of datadog-ci to install"
+        description: "Version of datadog-ci to install (format: `vA.B.C`)"
         type: string
         default: "latest"
 
@@ -45,8 +32,10 @@ jobs:
           git config user.email noreply@github.com
       - name: Install dependencies
         run: yarn install
-      - name: Bump CI integration version
-        run: yarn version --${{ github.event.inputs.semver }}
+      - name: Bump datadog-ci
+        run: |
+          VERSION=${{ github.event.inputs.semver || 'echo "my version"' }}
+          echo "computed: $VERSION"
       - name: Update build files
         run: yarn build && yarn package
       - name: Amend version commit
