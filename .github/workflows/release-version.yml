@@ -60,19 +60,6 @@ jobs:
         run: git push --follow-tags -u origin local-branch:release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}
 
       # Create the pull request
-      - name: Create pull request
-        id: create-pull-request
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { data: pullRequest } = github.rest.pulls.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              base: 'main',
-              head: 'release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
-            })
-
-            return pullRequest.number
       - name: Generate release notes
         id: generate-release-notes
         uses: actions/github-script@v6
@@ -85,6 +72,21 @@ jobs:
             })
 
             return releaseNotes.body
+      - name: Create pull request
+        id: create-pull-request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: pullRequest } = github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: 'main',
+              head: 'release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
+              title: 'Release `${{ steps.amend-version-commit.outputs.VERSION_TAG }}`'
+              body: '${{ steps.generate-release-notes.outputs.result }}'
+            })
+
+            return pullRequest.number
       - name: Create comment
         uses: actions/github-script@v6
         with:
@@ -93,5 +95,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: ${{steps.create-pull-request.outputs.result}},
-              body: '${{steps.generate-release-notes.outputs.result}}'
+              body: 'Hello you! 👋'
             })
