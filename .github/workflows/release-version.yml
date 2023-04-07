@@ -50,11 +50,10 @@ jobs:
         run: |
           VERSION_TAG=$(git tag --points-at HEAD) 
           git commit --amend --no-edit
-          echo "VERSION_TAG: $VERSION_TAG"
           git tag --force $VERSION_TAG
-          echo "::set-output name=version_tag::$VERSION_TAG"
+          echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_OUTPUT
       - name: Push the branch (with tags)
-        run: git push --follow-tags -u origin local-branch:release/${{ steps.amend-version-commit.outputs.version_tag }}
+        run: git push --follow-tags -u origin local-branch:release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}
 
   create-pull-request:
     name: Create pull request
@@ -70,7 +69,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               head: 'main',
-              base: 'release/${{ steps.amend-version-commit.outputs.version_tag }}',
+              base: 'release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
             })
 
             return pullRequest.number
@@ -82,7 +81,7 @@ jobs:
             const { data: releaseNotes } = await github.rest.repos.generateReleaseNotes({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: '${{ steps.amend-version-commit.outputs.version_tag }}',
+              tag_name: '${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
             })
 
             return releaseNotes.body
