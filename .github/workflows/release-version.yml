@@ -68,8 +68,8 @@ jobs:
             const { data: pullRequest } = github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              head: 'main',
-              base: 'release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
+              base: 'main',
+              head: 'release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
             })
 
             return pullRequest.number
