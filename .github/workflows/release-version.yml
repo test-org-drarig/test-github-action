@@ -25,12 +25,14 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
-  prepare-branch:
+  create-release-pull-request:
     name: Prepare the release branch
     runs-on: ubuntu-latest
     steps:
+      # Do the changes
       - uses: actions/checkout@v2
       - name: Install node
         uses: actions/setup-node@v2
@@ -40,7 +42,7 @@ jobs:
         run: git checkout -b local-branch
       - name: Set git user
         run: |
-          git config user.name "Release Automation"
+          git config user.name "GitHub Actions"
           git config user.email noreply@github.com
       - name: Install dependencies
         run: yarn install
@@ -58,11 +60,7 @@ jobs:
       - name: Push the branch (with tags)
         run: git push --follow-tags -u origin local-branch:release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}
 
-  create-pull-request:
-    name: Create pull request
-    runs-on: ubuntu-latest
-    needs: [prepare-branch]
-    steps:
+      # Create the pull request
       - name: Create pull request
         id: create-pull-request
         uses: actions/github-script@v6
@@ -88,7 +86,7 @@ jobs:
             })
 
             return releaseNotes.body
-      - name: Generate release notes
+      - name: Create comment
         uses: actions/github-script@v6
         with:
           script: |
