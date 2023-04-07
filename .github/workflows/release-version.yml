@@ -34,9 +34,9 @@ jobs:
         run: yarn install
       - name: Bump datadog-ci
         run: |
-          VERSION=$(echo "${{ github.event.inputs.semver || 'my version' }}")
+          VERSION=$(echo "${{ github.event.inputs.datadog_ci_version || 'my version' }}")
           echo "computed: $VERSION"
-          echo "computed: ${{ github.event.inputs.semver }}"
+          echo "computed: ${{ github.event.inputs.datadog_ci_version }}"
       # - name: Update build files
       #   run: yarn build && yarn package
       # - name: Amend version commit
