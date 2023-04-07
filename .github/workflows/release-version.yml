@@ -64,6 +64,7 @@ jobs:
         id: create-pull-request
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { data: pullRequest } = github.rest.pulls.create({
               owner: context.repo.owner,
