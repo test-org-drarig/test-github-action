@@ -36,14 +36,14 @@ jobs:
         id: bump-datadog-ci
         run: |
           VERSION=${{ github.event.inputs.datadog_ci_version }}
-
           if [ "$VERSION" = "latest" ]; then
             VERSION=$(npm view @datadog/datadog-ci --json | jq -r '.version')
           fi
 
           yarn add @datadog/datadog-ci@^$VERSION
-
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+      - name: Create bump commit
+        run: git commit -a --message '[dep] Bump datadog-ci to `${{ steps.bump-datadog-ci.outputs.VERSION }}`'
       - name: Push the branch (with tags)
         run: git push --follow-tags -u origin local-branch:upgrade-datadog-ci/${{ steps.bump-datadog-ci.outputs.VERSION }}
 
