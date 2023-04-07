@@ -33,6 +33,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Bump datadog-ci
+        id: bump-datadog-ci
         run: |
           VERSION=${{ github.event.inputs.datadog_ci_version }}
 
@@ -41,55 +42,36 @@ jobs:
           fi
 
           yarn add @datadog/datadog-ci@^$VERSION
-      # - name: Update build files
-      #   run: yarn build && yarn package
-      # - name: Amend version commit
-      #   id: amend-version-commit
-      #   run: |
-      #     VERSION_TAG=$(git tag --points-at HEAD)
-      #     git commit --all --amend --no-edit
-      #     git tag --force $VERSION_TAG
-      #     echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_OUTPUT
-      # - name: Push the branch (with tags)
-      #   run: git push --follow-tags -u origin local-branch:release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}
 
-      # # Create the pull request
-      # - name: Generate release notes
-      #   id: generate-release-notes
-      #   uses: actions/github-script@v6
-      #   with:
-      #     script: |
-      #       const { data: releaseNotes } = await github.rest.repos.generateReleaseNotes({
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         tag_name: '${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
-      #       })
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+      - name: Push the branch (with tags)
+        run: git push --follow-tags -u origin local-branch:upgrade-datadog-ci/${{ steps.bump-datadog-ci.outputs.VERSION }}
 
-      #       return releaseNotes.body
-      # - name: Create pull request
-      #   id: create-pull-request
-      #   uses: actions/github-script@v6
-      #   with:
-      #     script: |
-      #       const { data: pullRequest } = await github.rest.pulls.create({
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         base: 'main',
-      #         head: 'release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
-      #         title: '[release:${{ github.event.inputs.semver }}] `${{ steps.amend-version-commit.outputs.VERSION_TAG }}`',
-      #         body: ${{ steps.generate-release-notes.outputs.result }}
-      #       })
+      # Create the pull request
+      - name: Create pull request
+        id: create-pull-request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: pullRequest } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: 'main',
+              head: 'upgrade-datadog-ci/${{ steps.bump-datadog-ci.outputs.VERSION }}',
+              title: '[dep] Bump datadog-ci to `${{ steps.bump-datadog-ci.outputs.VERSION }}`',
+              body: 'This PR bumps [datadog-ci](https://github.com/DataDog/datadog-ci) to version [`${{ steps.bump-datadog-ci.outputs.VERSION }}`](https://github.com/DataDog/datadog-ci/releases/tag/${{ steps.bump-datadog-ci.outputs.VERSION }})'
+            })
 
-      #       return pullRequest.number
-      # - name: Create comment
-      #   uses: actions/github-script@v6
-      #   with:
-      #     script: |
-      #       const body = require('./ci/release-pr-comment')
+            return pullRequest.number
+      - name: Create comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const body = require('./ci/release-pr-comment')
 
-      #       github.rest.issues.createComment({
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         issue_number: ${{steps.create-pull-request.outputs.result}},
-      #         body
-      #       })
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{steps.create-pull-request.outputs.result}},
+              body
+            })
