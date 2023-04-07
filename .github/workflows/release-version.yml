@@ -53,7 +53,7 @@ jobs:
         id: amend-version-commit
         run: |
           VERSION_TAG=$(git tag --points-at HEAD) 
-          git commit --amend --no-edit
+          git commit --all --amend --no-edit
           git tag --force $VERSION_TAG
           echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_OUTPUT
       - name: Push the branch (with tags)
