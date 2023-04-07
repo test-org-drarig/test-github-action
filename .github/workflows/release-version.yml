@@ -23,6 +23,9 @@ on:
         type: string
         default: "latest"
 
+permissions:
+  contents: write
+
 jobs:
   prepare-branch:
     name: Prepare the release branch
@@ -54,6 +57,8 @@ jobs:
           echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_OUTPUT
       - name: Push the branch (with tags)
         run: git push --follow-tags -u origin local-branch:release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   create-pull-request:
     name: Create pull request
@@ -64,7 +69,6 @@ jobs:
         id: create-pull-request
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { data: pullRequest } = github.rest.pulls.create({
               owner: context.repo.owner,
