@@ -42,9 +42,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Bump CI integration version
-        run: |
-          echo ${{ github.events.inputs.semver }}
-          yarn version --${{ github.events.inputs.semver }}
+        run: yarn version --${{ github.event.inputs.semver }}
       - name: Update build files
         run: yarn build && yarn package
       - name: Amend version commit
@@ -52,6 +50,7 @@ jobs:
         run: |
           VERSION_TAG=$(git tag --points-at HEAD) 
           git commit --amend --no-edit
+          echo "VERSION_TAG: $VERSION_TAG"
           git tag --force $VERSION_TAG
           echo "::set-output name=version_tag::$VERSION_TAG"
       - name: Push the branch (with tags)
