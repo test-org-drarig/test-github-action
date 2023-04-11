@@ -9,5 +9,13 @@ jobs:
     if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, '[release:')
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo PR ${{ toJSON(github.event) }} has been merged
+      - name: Create GitHub release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            octokit.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: ${{ github.event.pull_request.head.ref }},
+              body: ${{ github.event.pull_request.body }}
+            });
