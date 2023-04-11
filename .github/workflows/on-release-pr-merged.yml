@@ -4,6 +4,9 @@ on:
     types:
       - closed
 
+permissions:
+  contents: write
+
 jobs:
   merge_job:
     if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, '[release:')
@@ -16,6 +19,6 @@ jobs:
             github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: ${{ toJSON(github.event.pull_request.head.ref) }}.replace('release/', ''),
+              tag_name: '${{ github.event.pull_request.head.ref }}'.replace('release/', ''),
               body: ${{ toJSON(github.event.pull_request.body) }}
             });
