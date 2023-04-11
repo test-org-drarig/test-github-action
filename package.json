@@ -6,7 +6,5 @@
     "build": "echo build >> index.js",
     "package": "mkdir -p ./dist && cp index.js dist/index.js"
   },
-  "dependencies": {
-    "@datadog/datadog-ci": "^2.7.0"
-  }
+  "dependencies": {}
 }
