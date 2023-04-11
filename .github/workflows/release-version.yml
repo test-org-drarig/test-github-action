@@ -11,9 +11,9 @@ on:
         default: "minor"
         type: choice
         options:
-          - "patch"
+          # - "patch"
           - "minor"
-          - "major"
+          # - "major"
 
 permissions:
   contents: write
