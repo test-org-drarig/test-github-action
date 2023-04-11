@@ -16,6 +16,6 @@ jobs:
             octokit.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: ${{ github.event.pull_request.head.ref }},
-              body: ${{ github.event.pull_request.body }}
+              tag_name: ${{ toJSON(github.event.pull_request.head.ref) }}.replace('release/', ''),
+              body: ${{ toJSON(github.event.pull_request.body) }}
             });
