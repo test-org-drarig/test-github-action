@@ -28,7 +28,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v3
         with:
-          node-version: "lts/*"
+          node-version: "16"
       - name: Create release branch
         run: git checkout -b local-branch
       - name: Set git user
