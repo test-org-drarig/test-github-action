@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 jobs:
-  merge_job:
+  release-version-on-merge:
     if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, '[release:')
     runs-on: ubuntu-latest
     steps:
