@@ -1,0 +1,42 @@
+name: 'Datadog Synthetics CI'
+description: 'Run Datadog Synthetics CI tests as part of your Github Actions workflow'
+author: 'Datadog'
+inputs:
+  api_key:
+    required: true
+    description: 'Datadog API key.'
+  app_key:
+    required: true
+    description: 'Datadog Application key.'
+  datadog_site:
+    required: false
+    description: 'Datadog site.'
+  public_ids:
+    required: false
+    description: 'Public IDs of Synthetic tests to run.'
+  config_path:
+    required: false
+    description: 'Path to global configuration JSON.'
+  files:
+    required: false
+    description: 'Glob pattern to detect Synthetic tests config.'
+  subdomain:
+    required: false
+    description: 'Name of your Datadog custom subdomain.'
+  test_search_query:
+    required: false
+    description: 'Search query to trigger tests.'
+  tunnel:
+    required: false
+    description: 'Enable tunnel to interact with Datadog API.'
+    default: false
+  variables:
+    required: false
+    description: 'Comma-separated list of variable_name=variable_value pairs.'
+  junit_report:
+    required: false
+    description: 'The filename for a JUnit report if you want to generate one.'
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
