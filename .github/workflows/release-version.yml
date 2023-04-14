@@ -84,11 +84,11 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const body = require('./ci/release-pr-comment')
+            const {releaseVersionComment} = require('./ci/pull-request-comments')
 
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: ${{steps.create-pull-request.outputs.result}},
-              body
+              body: releaseVersionComment,
             })
