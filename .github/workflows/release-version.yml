@@ -76,12 +76,9 @@ jobs:
               base: 'main',
               head: 'release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
               title: '[release:${{ github.event.inputs.semver }}] `${{ steps.amend-version-commit.outputs.VERSION_TAG }}`',
-
-              // will this work????
-              body: ${{ steps.generate-release-notes.outputs.RELEASE_NOTES }}
+              body: ${{ toJSON(steps.generate-release-notes.outputs.RELEASE_NOTES) }}
             })
 
-            // return pullRequest.number
             core.setOutput("PULL_REQUEST_NUMBER", pullRequest.number)
       - name: Create comment
         uses: actions/github-script@v6
