@@ -20,6 +20,8 @@ jobs:
     steps:
       # Do the changes
       - uses: actions/checkout@v3
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Install node
         uses: actions/setup-node@v3
         with:
