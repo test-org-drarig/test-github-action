@@ -78,7 +78,7 @@ jobs:
               title: '[release:${{ github.event.inputs.semver }}] `${{ steps.amend-version-commit.outputs.VERSION_TAG }}`',
 
               // will this work????
-              body: ${{ toJSON(steps.generate-release-notes.outputs.RELEASE_NOTES) }}
+              body: ${{ steps.generate-release-notes.outputs.RELEASE_NOTES }}
             })
 
             // return pullRequest.number
