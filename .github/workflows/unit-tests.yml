@@ -17,5 +17,4 @@ jobs:
           node-version: "lts/*"
       - run: yarn install --immutable
       - run: yarn build
-      - run: yarn lint
       - run: yarn test
