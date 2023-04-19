@@ -64,7 +64,7 @@ jobs:
               tag_name: '${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
             })
 
-            core.setOutput("RELEASE_NOTES", releaseNotes)
+            core.setOutput("RELEASE_NOTES", releaseNotes.body)
       - name: Create pull request
         id: create-pull-request
         uses: actions/github-script@v6
@@ -78,7 +78,7 @@ jobs:
               title: '[release:${{ github.event.inputs.semver }}] `${{ steps.amend-version-commit.outputs.VERSION_TAG }}`',
 
               // will this work????
-              body: ${{ steps.generate-release-notes.outputs.RELEASE_NOTES }}
+              body: ${{ toJSON(steps.generate-release-notes.outputs.RELEASE_NOTES) }}
             })
 
             // return pullRequest.number
