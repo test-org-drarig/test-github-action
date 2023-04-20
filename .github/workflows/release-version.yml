@@ -65,6 +65,7 @@ jobs:
         id: generate-release-notes
         uses: actions/github-script@v6
         with:
+          github-token: ${{ steps.get_token.outputs.token }}
           script: |
             const { data: releaseNotes } = await github.rest.repos.generateReleaseNotes({
               owner: context.repo.owner,
@@ -77,6 +78,7 @@ jobs:
         id: create-pull-request
         uses: actions/github-script@v6
         with:
+          github-token: ${{ steps.get_token.outputs.token }}
           script: |
             const { data: pullRequest } = await github.rest.pulls.create({
               owner: context.repo.owner,
@@ -91,6 +93,7 @@ jobs:
       - name: Create comment
         uses: actions/github-script@v6
         with:
+          github-token: ${{ steps.get_token.outputs.token }}
           script: |
             const { releaseVersionComment } = require('./ci/pull-request-comments')
 
