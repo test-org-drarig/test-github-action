@@ -114,7 +114,7 @@ export const getReporter = (): synthetics.MainReporter => {
 
   const jUnitReportFilename = getDefinedInput('junit_report')
   if (jUnitReportFilename) {
-    reporters.push(new synthetics.JUnitReporter({context, jUnitReport: jUnitReportFilename}))
+    // reporters.push(new synthetics.JUnitReporter({context, jUnitReport: jUnitReportFilename}))
   }
 
   return synthetics.utils.getReporter(reporters)
