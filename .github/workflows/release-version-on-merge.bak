@@ -1,3 +1,5 @@
+# This workflow automatically creates a GitHub release when a release PR is merged.
+
 name: On Release PR merged
 on:
   pull_request:
