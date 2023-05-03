@@ -25,7 +25,6 @@ pool:
   vmImage: "ubuntu-latest"
 
 variables:
-  - group: ci-variables
   - name: artifactPath
     value: vsix
   - name: packagedTask
