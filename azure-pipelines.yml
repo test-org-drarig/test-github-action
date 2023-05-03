@@ -1,0 +1,113 @@
+# Disable the pipeline for individual commits except on `main` merges.
+# The pipeline requires a Pull Request to run.
+trigger:
+  - main
+
+parameters:
+  - name: performRelease
+    displayName: Release Production Extension
+    type: boolean
+    default: false
+  - name: releaseSemver
+    displayName: Release Production semver
+    type: string
+    default: Patch
+    values:
+      - Patch
+      - Minor
+      - Major
+  - name: performDevRelease
+    displayName: Release DEV Extension
+    type: boolean
+    default: false
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:
+  - group: ci-variables
+  - name: artifactPath
+    value: vsix
+  - name: packagedTask
+    value: datadog-ci.vsix
+  - name: publisherId
+    value: Datadog
+  - name: extensionName
+    value: "Datadog CI"
+  - name: extensionId
+    value: datadog-ci
+  - name: devExtensionTag
+    value: -dev
+  - name: syntheticsTaskId
+    value: synthetics-application-testing
+
+stages:
+  # Build and package .vsix extension file
+  - stage: Build
+    jobs:
+      - job: Build
+        steps:
+          - task: Bash@3
+            displayName: Compile the Synthetics task
+            inputs:
+              targetType: "inline"
+              script: |
+                echo "Compiling the task"
+
+  - ${{ if and(eq(parameters.performRelease, false), eq(parameters.performDevRelease, false)) }}:
+      - stage: Test
+        displayName: E2E tests
+        dependsOn: "Build"
+        jobs:
+          - job: E2E
+            displayName: Cross-platform
+            strategy:
+              matrix:
+                Linux:
+                  imageName: "ubuntu-latest"
+                Windows:
+                  imageName: "windows-latest"
+            pool:
+              vmImage: $(imageName)
+            steps:
+              - task: Bash@3
+                displayName: Run the task
+                inputs:
+                  workingDirectory: "extracted/SyntheticsRunTestsTask"
+                  targetType: "inline"
+                  script: |
+                    echo "Running tests with the uncompressed package"
+
+  # Release DEV extension on `performDevRelease` or automatically on `main` push
+  - ${{ if or(eq(parameters.performDevRelease, true), eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
+      - stage: ReleaseDev
+        displayName: Release DEV
+        dependsOn: "Build"
+        jobs:
+          - job: PublishDev
+            displayName: Publish DEV version
+            steps:
+              - task: Bash@3
+                displayName: Publish DEV
+                inputs:
+                  workingDirectory: "extracted/SyntheticsRunTestsTask"
+                  targetType: "inline"
+                  script: |
+                    echo "Publishing dev"
+
+  # Extension public release, only performed on manual runs
+  - ${{ if eq(parameters.performRelease, true) }}:
+      - stage: Release
+        displayName: Release
+        dependsOn: "Build"
+        jobs:
+          - job: PublishPublic
+            displayName: Publish (public)
+            steps:
+              - task: Bash@3
+                displayName: Publish PUBLIC
+                inputs:
+                  workingDirectory: "extracted/SyntheticsRunTestsTask"
+                  targetType: "inline"
+                  script: |
+                    echo "Publishing public"
