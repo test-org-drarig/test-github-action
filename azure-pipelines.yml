@@ -21,9 +21,6 @@ parameters:
     type: boolean
     default: false
 
-pool:
-  vmImage: "ubuntu-latest"
-
 variables:
   - name: artifactPath
     value: vsix
