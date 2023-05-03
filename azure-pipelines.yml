@@ -25,7 +25,6 @@ pool:
   vmImage: "ubuntu-latest"
 
 variables:
-  - group: ci-variables
   - name: artifactPath
     value: vsix
   - name: packagedTask
@@ -73,7 +72,6 @@ stages:
               - task: Bash@3
                 displayName: Run the task
                 inputs:
-                  workingDirectory: "extracted/SyntheticsRunTestsTask"
                   targetType: "inline"
                   script: |
                     echo "Running tests with the uncompressed package"
@@ -90,7 +88,6 @@ stages:
               - task: Bash@3
                 displayName: Publish DEV
                 inputs:
-                  workingDirectory: "extracted/SyntheticsRunTestsTask"
                   targetType: "inline"
                   script: |
                     echo "Publishing dev"
@@ -107,7 +104,6 @@ stages:
               - task: Bash@3
                 displayName: Publish PUBLIC
                 inputs:
-                  workingDirectory: "extracted/SyntheticsRunTestsTask"
                   targetType: "inline"
                   script: |
                     echo "Publishing public"
