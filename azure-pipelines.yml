@@ -59,15 +59,6 @@ stages:
         dependsOn: "Build"
         jobs:
           - job: E2E
-            displayName: Cross-platform
-            strategy:
-              matrix:
-                Linux:
-                  imageName: "ubuntu-latest"
-                Windows:
-                  imageName: "windows-latest"
-            pool:
-              vmImage: $(imageName)
             steps:
               - task: Bash@3
                 displayName: Run the task
