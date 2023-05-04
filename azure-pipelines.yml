@@ -21,6 +21,9 @@ parameters:
     type: boolean
     default: false
 
+pool:
+  name: my-pool
+
 variables:
   - name: artifactPath
     value: vsix
