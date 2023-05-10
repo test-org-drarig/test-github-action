@@ -25,8 +25,8 @@ jobs:
         id: get-token
         uses: tibdex/github-app-token@v1
         with:
-          app_id: ${{ secrets.RELEASE_AUTOMATION_GITHUB_APP_ID }}
-          private_key: ${{ secrets.RELEASE_AUTOMATION_GITHUB_APP_PRIVATE_KEY }}
+          app_id: ${{ secrets.PIPELINE_GITHUB_APP_ID }}
+          private_key: ${{ secrets.PIPELINE_GITHUB_APP_PRIVATE_KEY }}
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
