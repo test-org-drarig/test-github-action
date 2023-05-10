@@ -52,7 +52,7 @@ jobs:
       - name: Amend version commit
         id: amend-version-commit
         run: |
-          VERSION_TAG=$(jq -r '.version' package.json)
+          VERSION_TAG="v$(jq -r '.version' package.json)" # e.g. v1.1.0
           git add --all
           git commit -m $VERSION_TAG
           git tag $VERSION_TAG
