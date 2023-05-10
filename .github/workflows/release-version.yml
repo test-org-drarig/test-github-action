@@ -11,7 +11,6 @@ on:
     inputs:
       semver:
         description: "Semver argument for the version bump to do on the CI integration"
-        required: true
         default: "minor"
         type: choice
         options:
@@ -23,15 +22,15 @@ jobs:
     steps:
       # Do the changes
       - name: Get GitHub App token
-        id: get_token
+        id: get-token
         uses: tibdex/github-app-token@v1
         with:
-          app_id: ${{ secrets.PIPELINE_GITHUB_APP_ID }}
-          private_key: ${{ secrets.PIPELINE_GITHUB_APP_PRIVATE_KEY }}
+          app_id: ${{ secrets.RELEASE_AUTOMATION_GITHUB_APP_ID }}
+          private_key: ${{ secrets.RELEASE_AUTOMATION_GITHUB_APP_PRIVATE_KEY }}
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token: ${{ steps.get_token.outputs.token }}
+          token: ${{ steps.get-token.outputs.token }}
       - name: Install node
         uses: actions/setup-node@v3
         with:
@@ -46,16 +45,17 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Bump CI integration version
-        run: npm version ${{ github.event.inputs.semver }}
+        # In Yarn 3, the `version` plugin doesn't create a bump commit, nor a tag.
+        run: yarn version ${{ github.event.inputs.semver }}
       - name: Update build files
         run: yarn build && yarn package
       - name: Amend version commit
         id: amend-version-commit
         run: |
-          VERSION_TAG=$(git tag --points-at HEAD)
+          VERSION_TAG=$(jq -r '.version' package.json)
           git add --all
-          git commit --amend -m $VERSION_TAG
-          git tag --force $VERSION_TAG
+          git commit -m $VERSION_TAG
+          git tag $VERSION_TAG
           echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_OUTPUT
       - name: Push the branch (with tags)
         run: git push --follow-tags -u origin local-branch:release/${{ steps.amend-version-commit.outputs.VERSION_TAG }}
@@ -65,7 +65,7 @@ jobs:
         id: generate-release-notes
         uses: actions/github-script@v6
         with:
-          github-token: ${{ steps.get_token.outputs.token }}
+          github-token: ${{ steps.get-token.outputs.token }}
           script: |
             const { data: releaseNotes } = await github.rest.repos.generateReleaseNotes({
               owner: context.repo.owner,
@@ -73,12 +73,12 @@ jobs:
               tag_name: '${{ steps.amend-version-commit.outputs.VERSION_TAG }}',
             })
 
-            core.setOutput("RELEASE_NOTES", releaseNotes.body)
+            core.setOutput('RELEASE_NOTES', releaseNotes.body)
       - name: Create pull request
         id: create-pull-request
         uses: actions/github-script@v6
         with:
-          github-token: ${{ steps.get_token.outputs.token }}
+          github-token: ${{ steps.get-token.outputs.token }}
           script: |
             const { data: pullRequest } = await github.rest.pulls.create({
               owner: context.repo.owner,
@@ -89,17 +89,17 @@ jobs:
               body: ${{ toJSON(steps.generate-release-notes.outputs.RELEASE_NOTES) }}
             })
 
-            core.setOutput("PULL_REQUEST_NUMBER", pullRequest.number)
+            core.setOutput('PULL_REQUEST_NUMBER', pullRequest.number)
       - name: Create comment
         uses: actions/github-script@v6
         with:
-          github-token: ${{ steps.get_token.outputs.token }}
+          github-token: ${{ steps.get-token.outputs.token }}
           script: |
             const { releaseVersionComment } = require('./ci/pull-request-comments')
 
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: ${{steps.create-pull-request.outputs.PULL_REQUEST_NUMBER}},
+              issue_number: ${{ steps.create-pull-request.outputs.PULL_REQUEST_NUMBER }},
               body: releaseVersionComment,
             })
