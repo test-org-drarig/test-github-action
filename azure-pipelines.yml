@@ -108,7 +108,7 @@ stages:
                   script: |
                     echo "Publishing public"
 
-  - stage: Test prod
+  - stage: TestProd
     displayName: E2E tests PROD Extension
     jobs:
       - job: E2E
