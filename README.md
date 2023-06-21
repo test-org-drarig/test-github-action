@@ -2,8 +2,6 @@
 
 Trigger Synthetic tests from your GitHub workflows with the [Datadog CI Synthetics command][1].
 
-Example PR
-
 ## Setup
 
 To get started:
