@@ -1,0 +1,21 @@
+on: push
+
+jobs:
+  my-job:
+    name: OS ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-18.04
+          - ubuntu-20.04
+    steps:
+      - run: echo ${{ github.job }} # Will only return the job_id: "my-job"
+      - run: |
+          JOB_NAME="OS ${{ matrix.os }} ${{ github.job }}"
+          echo $JOB_NAME
+          echo "JOB_NAME=$JOB_NAME" >> $GITHUB_ENV
+
+      - name: Print JOB_NAME
+        run: |
+          echo "JOB NAME:" ${{ env.JOB_NAME }}
