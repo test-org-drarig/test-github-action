@@ -4,6 +4,9 @@ Trigger Synthetic tests from your GitHub workflows with the [Datadog CI Syntheti
 
 Example PR
 
+> [!WARNING]
+> Critical content demanding immediate user attention due to potential risks.
+
 ## Setup
 
 To get started:
